@@ -1,0 +1,86 @@
+﻿@using System.Web.Mvc
+@using WebrootUI2.Resources
+
+@helper ErrorClass(System.Web.Mvc.ModelState state)
+{
+    @(state != null && state.Errors.Any() ? " error" : "")
+}
+
+@helper SidebarItem(string title, string action, string controller, object routeValues = null)
+{
+    var url = new UrlHelper(Context.Request.RequestContext);
+    <div class="accordion-heading">
+        <a class="accordion-toggle" href="@url.Action(action, controller, routeValues)">@title</a>
+    </div>
+}
+
+@helper SidebarGroup(params IHtmlString[] items)
+{
+    <div class="accordion-group">
+        @foreach (var item in items)
+        {
+            @item
+        }
+    </div>
+}
+
+@helper SidebarPanel(params IHtmlString[] items)
+{
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar_inner">
+            <div id="side_accordion" class="accordion">
+
+                @foreach (var item in items)
+                {
+                    @SidebarGroup(item)
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@helper SideBarTabGroup(string tabName, string tabDiaplayName, Dictionary<string, string> menuItems)
+{
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a href="#@tabName" data-parent="#side_accordion" data-toggle="collapse" class="accordion-toggle">
+                @tabDiaplayName
+            </a>
+        </div>
+        <div class="accordion-body collapse" id="@tabName">
+            <div class="accordion-inner">
+                <ul class="nav nav-list">
+                    @foreach (var menuItem in menuItems)
+                    {
+                        <li><a href="@menuItem.Value">@menuItem.Key</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+@helper SidebarSwitch()
+{
+    <i id="hide-sidebar" class="icon-arrow-left sidebar_switch"></i>
+    <i id="show-sidebar" class="icon-arrow-right sidebar_switch" style="left: 4px; display: none"></i>
+    
+    <script>
+
+        $("#hide-sidebar").click(function () {
+            $("#show-sidebar").show();
+            $("#sidebar").hide();
+            $("#hide-sidebar").hide();
+            $(".main_content").attr("style", "margin-left: 10px");
+        });
+
+        $("#show-sidebar").click(function () {
+            $("#hide-sidebar").show();
+            $("#sidebar").show();
+            $("#show-sidebar").hide();
+            $(".main_content").attr("style", "margin-left: 240px");
+        });
+
+    </script>
+
+}

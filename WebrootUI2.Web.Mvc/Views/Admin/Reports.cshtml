@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Reports";
+    ViewBag.MenuItem = "Reports";
+}
+
+<h2>Reports</h2>
+
+@section Sidebar
+{
+    @Helpers.SidebarPanel(
+        @Helpers.SidebarItem(Resource.DailySummaryMenuItem, "", "Admin"),
+        @Helpers.SidebarItem(Resource.MonthSummaryMenuItem, "", "Admin"),
+        @Helpers.SidebarItem(Resource.DepositMenuItem, "", "Admin"),
+        @Helpers.SidebarItem(Resource.ExpiryMenuItem, "", "Admin")
+    )
+}

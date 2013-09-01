@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "System";
+    ViewBag.MenuItem = "System";
+}
+
+<h2>System</h2>
+
+@section Sidebar
+{
+    @Helpers.SidebarPanel(
+        @Helpers.SidebarItem(Resource.AuditMenuItem, "", "Admin"),
+        @Helpers.SidebarItem(Resource.ConfigMenuItem, "", "Admin")
+    )
+}

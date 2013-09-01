@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "";
+}
+
+<header>
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container-fluid">
+                <a class="brand" href="#"><i class="icon-home icon-white"></i>WebrootUI2 Logo</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @Html.Partial("_Menu")
+                    @Html.Partial("_UserMenu")
+                }
+            </div>
+        </div>
+    </div>
+</header>

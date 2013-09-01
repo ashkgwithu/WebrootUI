@@ -1,0 +1,104 @@
+﻿@{
+    ViewBag.Title = "_Profile";
+}
+<div class="span12">
+    <h3 class="heading">User Profile</h3>
+    <div class="row-fluid">
+        <div class="span8">
+            <form class="form-horizontal">
+                <fieldset>
+                    <div class="control-group formSep">
+                        <label class="control-label">Username</label>
+                        <div class="controls text_line">
+                            <strong>@User.Identity.Name</strong>
+                        </div>
+                    </div>
+                    <div class="control-group formSep">
+                        <label for="fileinput" class="control-label">User avatar</label>
+                        <div class="controls">
+                            <div data-fileupload="image" class="fileupload fileupload-new">
+                                <div style="width: 80px; height: 80px;" class="fileupload-new thumbnail">
+                                    <img src="http://www.placehold.it/80x80/EFEFEF/AAAAAA" alt="">
+                                </div>
+                                <div style="width: 80px; height: 80px; line-height: 80px;" class="fileupload-preview fileupload-exists thumbnail">
+                                </div>
+                                <span class="btn btn-file">
+                                    <span class="fileupload-new">Select image</span>
+                                    <span class="fileupload-exists">Change</span>
+                                    <input type="file" id="fileinput" name="fileinput">
+                                </span>
+                                <a data-dismiss="fileupload" class="btn fileupload-exists" href="#">Remove</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group formSep">
+                        <label for="u_fname" class="control-label">Full name</label>
+                        <div class="controls">
+                            <input type="text" id="u_fname" class="input-xlarge" value="John Smith">
+                        </div>
+                    </div>
+                    <div class="control-group formSep">
+                        <label for="u_email" class="control-label">Email</label>
+                        <div class="controls">
+                            <input type="text" id="u_email" class="input-xlarge" value="johnSmith@example.com">
+                        </div>
+                    </div>
+                    <div class="control-group formSep">
+                        <label for="u_password" class="control-label">Password</label>
+                        <div class="controls">
+                            <div class="sepH_b">
+                                <input type="password" id="u_password" class="input-xlarge" value="my_password">
+                                <span class="help-block">Enter your password</span>
+                            </div>
+                            <input type="password" id="s_password_re" class="input-xlarge">
+                            <span class="help-block">Repeat password</span>
+                        </div>
+                    </div>
+                    <div class="control-group formSep">
+                        <label class="control-label">I want to receive:</label>
+                        <div class="controls">
+                            <label class="checkbox inline">
+                                <input type="checkbox" value="newsletter" id="email_newsletter" name="email_receive">
+                                Newsletters
+                            </label>
+                            <label class="checkbox inline">
+                                <input type="checkbox" value="sys_messages" id="email_sysmessages" name="email_receive" checked="checked">
+                                System messages
+                            </label>
+                            <label class="checkbox inline">
+                                <input type="checkbox" value="other_messages" id="email_othermessages" name="email_receive">
+                                Other messages
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group formSep">
+                        <label class="control-label">Gender</label>
+                        <div class="controls">
+                            <label class="radio inline">
+                                <input type="radio" value="male" id="s_male" name="f_gender" checked="checked">
+                                Male
+                            </label>
+                            <label class="radio inline">
+                                <input type="radio" value="female" id="s_female" name="f_gender">
+                                Female
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group formSep">
+                        <label for="u_signature" class="control-label">Signature</label>
+                        <div class="controls">
+                            <textarea rows="4" id="u_signature" class="input-xlarge" style="overflow: hidden; word-wrap: break-word; max-height: 80px; min-height: 80px; height: 80px;">Lorem ipsum…</textarea>
+                            <span class="help-block">Automatic resize</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn btn-gebo" type="submit">Save changes</button>
+                            <button class="btn">Cancel</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

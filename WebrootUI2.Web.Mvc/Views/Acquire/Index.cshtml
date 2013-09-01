@@ -1,0 +1,85 @@
+﻿@using WebrootUI2.Resources;
+@model WebrootUI2.Web.Mvc.Controllers.ViewModels.AuditModel
+@{
+    <div class="heading">
+        <div class="row-fluid">
+            <div class="span3">
+                <label>@Resource.Input_Name</label>
+                <input id="txtName" type="text" value="@Model.Username" />
+            </div>
+            <div class="span3">
+                <label>@Resource.Audit_Role</label>
+                <input id="txtRole" type="text"  value="@Model.RoleName" />
+            </div>
+            <div>
+                <input id="btnSearch" type="submit" class="btn" value="@Resource.Button_Search" style="margin-top: 2.5%" />
+            </div>
+        </div>
+    </div>
+    <table id="tableUsers" class="table table-striped table-bordered dTableR dataTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Reference</th>
+            </tr>
+        </thead>
+
+        @foreach (var user in @Model.Users)
+        {
+            <tr>
+                <td>@user.Name</td>
+                <td>@user.RoleName</td>
+                <td>@Html.ActionLink("View audit log", "Audit", "System", new { userId = @user.Id }, null)</td>
+            </tr> 
+        }
+    </table>
+    <div id="pagingDiv"></div>
+}
+
+@section Sidebar
+{
+    @Helpers.SideBarTabGroup("Audit", Resource.AuditMenuItem, new Dictionary<string, string>() { { "View", "Index" } })
+    @Helpers.SideBarTabGroup("Config", Resource.ConfigMenuItem, new Dictionary<string, string>() {{Resource.MenuItem_Bin,"Bin"},
+{Resource.MenuItem_Module,"Module"},{Resource.MenuItem_Acquire,"Acquire"},{Resource.MenuItem_Van,"Van"}})
+}
+
+<script type="text/ecmascript">
+    $(document).ready(function myfunction() {
+        $('#btnSearch').click(function () {
+            $.getJSON("/System/UsersSearch", { username: $('#txtName').val(), role: $('#txtRole').val() }, function (data) {
+                if (data.status == "success")
+                    loadUsersTable(data.userList, 1, data.recordsCount);
+            });
+        })
+
+
+        //Load paging in the initial load
+        $('#pagingDiv').empty();
+        $('#pagingDiv').append(pagination(8, 1, "@Model.TotalRecordsCount"));
+    });
+
+
+    //Load the Users list on search
+    function loadUsersTable(users, currentIndex, count) {
+        $('#tableUsers').empty();
+        $('#tableUsers').append("<thead><tr><th>Name</th><th>Role</th><th>Reference</th></tr></thead>");
+
+        $.each(users, function (index, value) {
+            $('#tableUsers').append("<tr><td>" + value.Name + "</td><td>"
+                + value.RoleName + "</td><td>" + "<a href=\"/System/Audit?userId=" + value.Id + "\">View audit log</a>" + "</td>"
+                + "</tr>");
+        });
+
+        $('#pagingDiv').empty();
+        $('#pagingDiv').append(pagination(8, currentIndex, count));
+    }
+
+    //Method which triggers the paging index change
+    function indexChanged(_index) {
+        $.getJSON("/System/PagingIndexChanged", { index: _index }, function (data) {
+            if (data.status == "success")
+                loadUsersTable(data.usersList, data.currentIndex, data.recordsCount);
+        });
+    }
+</script>

@@ -1,0 +1,42 @@
+﻿/*Reset password*/
+
+.resetpw-content{ margin-left:-250px; }
+    .resetpw-content h1{ font-family: "Segoe UI Web Light","Segoe UI Light","Segoe UI Web Regular","Segoe UI","Segoe UI Symbol","Helvetica Neue",Arial; }
+    .resetpw-content p { margin: 0 0 1.35em;}
+    .resetpw-content .item-row{margin-top:10px;color:#818181}
+
+.checkmark{
+    display: inline-block;
+    height: 12px;
+    width: 14px;
+    background-image: url('images/greenCheck.png');
+}
+
+#searchPanel
+{
+    vertical-align:central;
+}
+
+    #searchPanel .cell
+    {
+
+    }
+
+/*Administrator screen*/
+
+#divHeader
+{
+    cursor:pointer;
+}
+
+#divAddUser
+{
+    display:none;
+}
+
+/*Role screen*/
+
+#addRoleDiv
+{
+    display:none;
+}

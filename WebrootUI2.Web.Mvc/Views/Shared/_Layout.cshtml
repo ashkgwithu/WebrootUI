@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    @Scripts.Render("~/bundles/jquery", "~/bundles/jqueryval", "~/bundles/bootstrapjs")
+    @Styles.Render("~/Content/bootstrap", "~/Content/css")
+    @Styles.Render("~/Content/Gebo-Template")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Styles.Render("~/Content/jqueryui")
+    @Scripts.Render("~/bundles/common")
+    @Scripts.Render("~/bundles/paging")
+</head>
+<body>
+    @Html.Partial("_Header")
+    <div id="contentwrapper">
+        <div class="main_content">
+            <div class="row-fluid">
+                @if (IsSectionDefined("Sidebar"))
+                {
+                    <div id="sidebar" class="sidebar">
+                        <div class="sidebar_inner">
+                            <div id="side_accordion" class="accordion">
+                                @RenderSection("Sidebar")
+                            </div>
+                        </div>
+                    </div>
+                    @Helpers.SidebarSwitch()
+                }
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</body>
+</html>

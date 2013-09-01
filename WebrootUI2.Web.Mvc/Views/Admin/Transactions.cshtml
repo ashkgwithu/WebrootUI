@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.MenuItem = "Transactions";
+    ViewBag.Title = "Transactions";
+}
+@Html.Partial("_SearchOptions")
+<div class="row"></div>
+@Html.Partial("_SearchResult")
+
+@section Sidebar
+{
+    @Helpers.SidebarPanel(
+        Helpers.SidebarItem(Resource.TransactionsViewMenuItem, "", "Admin"),
+        Helpers.SidebarItem(Resource.RefundMenuItem, "", "Admin"),
+        Helpers.SidebarItem(Resource.ChargebookMenuItem, "", "Admin"),
+        Helpers.SidebarItem(Resource.ErrorMenuItem, "", "Admin")
+    )
+}

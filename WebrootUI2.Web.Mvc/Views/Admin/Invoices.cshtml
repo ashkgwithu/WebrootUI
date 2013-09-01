@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.MenuItem = "Invoices";
+    ViewBag.Title = "Invoices";
+}
+
+<h2>Accounts</h2>
+
+@section Sidebar
+{
+    @Helpers.SidebarPanel(
+        @Helpers.SidebarItem(Resource.CreateInvoiceMenuItem, "", "Admin"),
+        @Helpers.SidebarItem(Resource.HistoryMenuItem, "", "Admin"),
+        @Helpers.SidebarItem(Resource.PaymentMenuItem, "", "Admin")
+    )
+}

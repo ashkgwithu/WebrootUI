@@ -1,0 +1,105 @@
+﻿@using WebrootUI2.Web.Mvc.Providers
+@using WebrootUI2.Domain
+<ul id="menu" class="nav">
+    @if (User.Identity.IsAuthenticated)
+    {
+        @MenuDropDown(Resource.TransactionMenuItem,
+            Html.ActionLink(Resource.TransactionsViewMenuItem, "Transactions", "Admin"),
+            Html.ActionLink(Resource.RefundMenuItem, "Transactions", "Admin"),
+            Html.ActionLink(Resource.ChargebookMenuItem, "Transactions", "Admin"),
+            Html.ActionLink(Resource.ErrorMenuItem, "Transactions", "Admin"))
+            
+        @MenuDropDown(Resource.ReportsMenuItem,
+            Html.ActionLink(Resource.DailySummaryMenuItem, "Reports", "Admin"),
+            Html.ActionLink(Resource.MonthSummaryMenuItem, "Reports", "Admin"),
+            Html.ActionLink(Resource.DepositMenuItem, "Reports", "Admin"),
+            Html.ActionLink(Resource.ExpiryMenuItem, "Reports", "Admin"))
+        
+        @MenuDropDown(Resource.InvoicesMenuItem,
+            Html.ActionLink(Resource.CreateInvoiceMenuItem, "Invoices", "Admin"),
+            Html.ActionLink(Resource.HistoryMenuItem, "Invoices", "Admin"),
+            Html.ActionLink(Resource.PaymentMenuItem, "Invoices", "Admin"))
+        
+        if (SecurityProvider.HasPermission((User == null ? "" : User.Identity.Name),
+            new Common.AdminPermission[] { Common.AdminPermission.SuperAdminPermission, Common.AdminPermission.EditSystemSettings }))
+        {
+        @MenuDropDown(Resource.SystemMenuItem,
+            Html.ActionLink(Resource.AuditMenuItem, "Index", "System"),
+            Html.ActionLink(Resource.ConfigMenuItem, "Acquire", "System"))    
+        }
+    }
+</ul>
+
+@helper MenuDropDown(string name, params IHtmlString[] lis)
+{
+    <li class="dropdown">
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#">@name<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            @foreach (var li in lis)
+            {
+                if (li != null)
+                {
+                <li>@li</li>
+                }
+            }
+        </ul>
+    </li>
+}
+
+@*@{    
+    var controller = ViewContext.RouteData.Values["Controller"];
+    var action = ViewContext.RouteData.Values["Action"];
+    var language = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+    string content = "Help/_Help" + controller + action + "-" + language;
+    string title = "Help on " + controller + " > " + action;
+}
+@Dialog("helpOnPage", title, content)*@
+<div id="helpOnPage"></div>
+@helper MenuItem(string name, string title, string action, string controller)
+{
+    if (name == ViewBag.MenuItem)
+    {
+    <li class="active ">
+        @Html.ActionLink(title, action, controller)
+    </li>
+    }
+    else
+    {
+    <li>
+        @Html.ActionLink(title, action, controller)
+    </li>
+    }
+}
+@*@helper Dialog(string name, string title, string content)
+{
+    <div id="@name" title="@title"> 
+        @try
+        {       
+            @Html.Partial(content)
+        }
+        catch (Exception ex)
+        {
+            var language = System.Threading.Thread.CurrentThread.CurrentCulture.Name;
+            string defaultContent = "Help/_Help" + "-" + language;
+            @Html.Partial(defaultContent)
+        }
+    </div>   
+}*@
+<script>
+    $(function () {
+        $("#helpOnPage").dialog({ autoOpen: false });
+    });
+
+    function openHelpDialog() {
+        var pathname = window.location.pathname;
+        if (pathname != null && pathname != "" && pathname[0] == '/') {
+            pathname = pathname.substring(1);
+            if (pathname == "") {
+                pathname = "Admin/Accounts";
+            }
+            var title = pathname.replace(new RegExp("/", "gm"), ' > ');
+            $('#helpOnPage').dialog({ title: title });
+            $('#helpOnPage').load("@Url.Action("Help", "App")" + "?path=" + pathname).dialog('open');
+        }
+    }
+</script>

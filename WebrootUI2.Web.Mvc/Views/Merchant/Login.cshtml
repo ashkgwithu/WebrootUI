@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "../Shared/_Layout.cshtml";   
+}
+<h2>
+    User Login</h2>
+<form id="formLogin" action="loginaction" method="post">
+Username
+<input type="text" name="username" /><br />
+<br />
+Password
+<input type="password" name="password" /><br />
+<br />
+<input id="btnLogin" type="submit" value="Login" />
+<br />
+<a href="resetpassword">Can't access your account?</a>
+</form>
+<div>
+    <span style="color: Red">@TempData["error"] </span>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#formLogin').validate({
+            rules: {
+                username: { required: true },
+                password: { required: true }
+            },
+            messages: {
+                username: { required: 'Please enter a username' },
+                password: { required: 'Please enter a password' }
+            }
+        });
+
+        $('#btnLogin').click(function () {
+            if (!$('#formLogin').validate())
+                return false;
+        });
+    });
+</script>

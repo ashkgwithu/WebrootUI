@@ -1,0 +1,221 @@
+﻿@{
+    Layout = "";//Login page does not need the _Layout.cshtml to be inherited
+    ViewBag.Title = "Login";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    Response.Redirect("Home");
+}
+
+<!DOCTYPE html>
+<html lang="en" class="login_page" >
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    @Scripts.Render("~/bundles/jquery", "~/bundles/jqueryval", "~/bundles/bootstrapjs", "~/bundles/jqueryadd")
+    @Styles.Render("~/Content/bootstrap", "~/Content/css")
+</head>
+<body>
+        <div class="login_box">
+            <form id="formLogin" action="loginaction" method="post" style="display: none">
+                <div class="top_b">@Resource.Login_SignInToAdmin </div>
+                @if (TempData["error"] != null)
+                {
+                    <div class="alert alert-error alert-login">
+                        @TempData["error"]
+                        <a class="close" data-dismiss="alert">×</a>
+                    </div>
+                }
+                <div class="cnt_b">
+                    <div class="formRow">
+                        <div class="input-prepend">
+                            <span class="add-on"><i class="icon-user"></i></span>
+                            <input type="text" id="username" name="username" placeholder="@Resource.Login_Username" />
+                        </div>
+                    </div>
+                    <div class="formRow">
+                        <div class="input-prepend">
+                            <span class="add-on"><i class="icon-lock"></i></span>
+                            <input type="password" id="password" name="password" placeholder="@Resource.Login_Password"  />
+                        </div>
+                    </div>
+                </div>
+                <div class="btm_b clearfix">
+                    <button class="btn btn-inverse pull-right" type="submit">@Resource.Button_SignIn</button>
+                </div>
+            </form>
+            <form id="formPostUsername" method="post" action="postusername" style="display: none">
+                <div class="top_b">@Resource.User_ResetYourPassword</div>
+                @if (TempData["errorUsername"] != null)
+                {
+                    <div class="alert alert-error alert-login">
+                        @TempData["errorUsername"]
+                        <a class="close" data-dismiss="alert">×</a>
+                    </div>
+                }
+                <div class="cnt_b">
+                    <div class="formRow">
+                        <div class="input-prepend">
+                            <span class="add-on"><i class="icon-user"></i></span>
+                            <input type="text" id="forgotUsername" name="forgotUsername" placeholder="@Resource.Login_Username" />
+                        </div>
+                    </div>
+                </div>
+                <div class="btm_b clearfix">
+                    <button class="btn btn-inverse pull-right" type="submit">@Resource.Button_Submit</button>
+                </div>
+            </form>
+            <form id="formQuestion" method="post" action="postanswer" style="display: none">
+                <div class="top_b">@Resource.User_ResetYourPassword</div>
+                @if (TempData["errorAnswer"] != null)
+                {
+                    <div class="alert alert-error alert-login">
+                        @TempData["errorAnswer"]
+                        <a class="close" data-dismiss="alert">×</a>
+                    </div>
+                }
+                <div class="cnt_b">
+                    <div class="formRow">
+                        @ViewData["question"]
+                    </div>
+                    <div class="formRow">
+                        <div class="input-prepend">
+                            <span class="add-on">?</span>
+                            <input type="text" id="answer" name="answer" placeholder="@Resource.User_Answer" />
+                        </div>
+                    </div>
+                </div>
+                <div class="btm_b clearfix">
+                    <button class="btn btn-inverse pull-right" type="submit">@Resource.Button_Submit</button>
+                </div>
+            </form>
+            <div id="divSuccess" style="display: none; height: 250px">
+                <div class="top_b">@Resource.User_ResetYourPassword</div>
+                <div class="formRow">
+                    <div class="alert alert-success alert-login">
+                        @Resource.User_SecurityQuestionSucceed
+                    </div>
+                </div>
+            </div>
+            <div class="links_b links_btm clearfix">
+                <span id="forgotPW" class="linkform" style="display: none"><a href="#formPostUsername">@Resource.Login_ForgotPassword?</a></span>
+                <span id="navBack" class="linkform" style="display: inline">@Resource.Login_NeverMind, <a href="#formLogin">@Resource.Login_SendBackToLogin</a></span>
+            </div>
+        </div>
+</body>
+</html>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var action = '@Request.QueryString["action"]';
+
+        switch (action) {
+            default:
+                $('#formLogin').css('display', 'block');
+                $('#forgotPW').css('display', 'block');
+                $('#navBack').css('display', 'none');
+                break;
+            case 'postusername':
+                $('#formPostUsername').css('display', 'block');
+                break;
+            case 'postanswer':
+                $('#formQuestion').css('display', 'block');
+                break;
+            case 'success':
+                $('#navBack').css('display', 'none');
+                $('#divSuccess').css('display', 'block');
+                break;
+        }
+
+        //* boxes animation
+        form_wrapper = $('.login_box');
+
+        $('.linkform a').on('click', function (e) {
+            var target = $(this).attr('href'),
+                target_height = $(target).actual('height');
+            $(form_wrapper).css({
+                'height': form_wrapper.height()
+            });
+            $(form_wrapper.find('form:visible')).fadeOut(400, function () {
+                form_wrapper.stop().animate({
+                    height: target_height,
+                }, 500, function () {
+                    $(target).fadeIn(400);
+                    $('.links_btm .linkform').toggle();
+                    $(form_wrapper).css({
+                        'height': ''
+                    });
+                });
+            });
+            e.preventDefault();
+        });
+
+
+        //Validation Login
+        $('#formLogin').validate({
+            rules: {
+                username: { required: true, minlength: 3 },
+                password: { required: true, minlength: 3 }
+            },
+            highlight: function (element) {
+                $(element).closest('div').addClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            unhighlight: function (element) {
+                $(element).closest('div').removeClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            errorPlacement: function (error, element) {
+                $(element).closest('div').append(error);
+            }
+        });
+
+        //Validation Reset password
+        $('#formPostUsername').validate({
+            rules: {
+                forgotUsername: { required: true },
+            },
+            highlight: function (element) {
+                $(element).closest('div').addClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            unhighlight: function (element) {
+                $(element).closest('div').removeClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            errorPlacement: function (error, element) {
+                $(element).closest('div').append(error);
+            }
+        });
+
+        $('#formQuestion').validate({
+            rules: {
+                answer: { required: true },
+            },
+            highlight: function (element) {
+                $(element).closest('div').addClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            unhighlight: function (element) {
+                $(element).closest('div').removeClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            errorPlacement: function (error, element) {
+                $(element).closest('div').append(error);
+            }
+        });
+
+    });
+</script>

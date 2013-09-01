@@ -1,0 +1,240 @@
+﻿ @using WebrootUI2.Web.Mvc.Controllers.ViewModels
+@using WebrootUI2.Resources;
+@model  List<AcquireModel>
+@{
+  
+    ViewBag.Title = "Acquire";
+    <div class="heading">
+         
+        <form id="formAcquire" method="post" action="AcquireInsert">
+            @if (TempData["error"] != null)
+            {
+                <div class="alert alert-error alert-login">
+                    @TempData["error"]
+                    <a class="close" data-dismiss="alert">×</a>
+                </div>
+            }
+        <div class="row-fluid">
+            <div class="span3">
+                <label> @Resource.Usr_nm</label>
+           <input id="txtName" type="text" name="txtName" /> 
+            </div>
+            <div class="span3">
+                <label>@Resource.Usr_Logicalid </label>
+               <input id="txtlogicalid" type="text"  name="txtlogicalid"   /> 
+            </div>
+              <div class="span3">
+                <label>@Resource.Usr_enable</label>
+                 
+                <input id="chkenable" type="checkbox" name="chkenable"    /> 
+            </div>
+            <div>
+                <input id="btnSave" type="submit" class="btn" value="@Resource.Usr_Save" style="margin-top: 2.5%" />
+            </div>
+        </div>
+        </form>
+    </div>
+    <div class="heading">
+
+        <div class="row-fluid">
+            <div class="span3">
+                <label>@Resource.Usr_nm </label>
+           <input id="txtName1" type="text"   /> 
+            </div>
+            <div class="span3">
+                <label>@Resource.Usr_Logicalid</label>
+               <input id="txtLogicId1" type="text"    /> 
+            </div>
+            <div>
+                <input id="btnSearch" type="submit" class="btn" value="Search" style="margin-top: 2.5%" />
+            </div>
+        </div>
+    </div>
+    <table id="tableUsers" class="table table-striped table-bordered dTableR dataTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>logicalid</th>
+                <th>Enabled</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+         @foreach (var acquire in @Model)
+         {
+            <tr>
+                <td>@acquire.name</td>
+                <td>@acquire.logicalid</td>
+                <td>@acquire.Enabled</td>
+                <td><a href="javascript:void(0)" class="editRec" title="edit" style="cursor:pointer;"><span class="ui-icon ui-icon-pencil">@acquire.Id</span></a> </td>
+                <td><a href="javascript:void(0)" class="delRec" title="delete" style="cursor:pointer;"><span class="ui-icon ui-icon-trash">@acquire.Id</span></a> </td>
+            </tr>
+         }
+
+    </table>
+    <div id="pagingDiv">
+        <input id="btnSearch1" type="submit" class="btn" value="Search" style="margin-top: 2.5%" />
+    </div>
+}
+
+@section Sidebar
+{
+    @Helpers.SideBarTabGroup("Audit", Resource.AuditMenuItem, new Dictionary<string, string>() { { "View", "Index" } })
+    @Helpers.SideBarTabGroup("Config", Resource.ConfigMenuItem, new Dictionary<string, string>() {{Resource.MenuItem_Bin,"Bin"},
+{Resource.MenuItem_Module,"Module"},{Resource.MenuItem_Acquire,"Acquire"},{Resource.MenuItem_Van,"Van"}})
+}
+<div id="editOnPage"> <p class="validateTips"></p>
+<form id="formAcquireEdt" >
+<fieldset>
+<label for="name">@Resource.Usr_nm</label>
+<input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" />
+<label for="Logicalid">@Resource.Usr_Logicalid</label>
+<input type="text" name="Logicalid" id="Logicalid" value="" class="text ui-widget-content ui-corner-all" />
+<label for="chkEnbl">@Resource.Usr_enable</label>
+<input type="checkbox" name="chkEnbl" id="chkEnbl" value="" class="text ui-widget-content ui-corner-all" />
+</fieldset>
+</form></div>
+<div id="dialog-confirm" title="Are you sure to delete the record?" style="display:none;">
+     <p><span class="ui-icon ui-icon-alert" style="float:left; margin: 0 7px 20px 0;"></span>These record will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+<script type="text/ecmascript">
+    $(document).ready(function myfunction() {
+
+        $("#editOnPage").dialog({ autoOpen: false });
+        $(document).on('click', '.editRec', function (e) {
+            var _id = $(this).find("span").text();
+            $.getJSON("/System/GetAcqurie", {
+                acquireid: _id
+            }, function (data) {
+                if (data.status == "success")
+                    var _id = $(this).find("span").text();
+
+                var pathname = window.location.pathname;
+                if (pathname != null && pathname != "" && pathname[0] == '/') {
+                    var title = "Update";
+                    $('#editOnPage').dialog({
+                        title: title, modal: true, autoOpen: false, buttons: {
+                            "Update": function () {
+                                $(this).dialog("close");
+                            },
+                            Cancel: function () {
+                                $(this).dialog("close");
+                            }
+                        },
+                        close: function () {
+                            allFields.val("").removeClass("ui-state-error");
+                        }
+                    });
+
+                    $('#editOnPage').load("@Url.Action("Help", "App")" + "?path=" + pathname).dialog('open');
+                }
+                $('#name').val(data.name); $('#Logicalid').val(data.logicalid);
+                $('#chkEnbl').checked = (data.enable);
+
+            });
+        });
+       
+        $(document).on('click','.delRec', function (e) {
+            var _id = $(this).find("span").text(); //alert(_id);
+            $("#dialog-confirm").dialog({
+                resizable: false,
+                width:340,
+                modal: true, show: {
+                    effect: "blind",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 1000
+                },
+                buttons: {
+                    "Delete": function () {
+                        $.getJSON("/System/delAcqurie", {
+                            acquireid: _id
+                        }, function (data) {
+                            if (data.status == "success")
+                                loadUsersTable(data.usersList, 1, data.recordsCount);
+                        });
+                        $(this).dialog("close");
+                    },
+                    Cancel: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        });
+
+
+        $('#btnSearch').click(function () {
+            //$('#txtLogicId1').val();
+            $.getJSON("/System/AcuireSearch", {
+                name: $('#txtName1').val(), logicalid: $('#txtLogicId1').val() == '' ? 0 : $('#txtLogicId1').val()
+            }, function (data) {
+                if (data.status == "success") {
+                    loadUsersTable(data.userList, 1, data.recordsCount);
+                }
+            });
+        })
+
+        //Load paging in the initial load
+        $('#pagingDiv').empty();
+        $('#pagingDiv').append(pagination(8, 1, "@ViewBag.recordsCount"));
+
+    });
+
+    //Load the Users list on search
+    function loadUsersTable(users, currentIndex, count) {
+         
+        $('#tableUsers').empty();
+        $('#tableUsers').append ("<thead><tr><th>Name</th><th>logicalid</th><th>Enabled</th><th>Edit</th><th>Delete</th></tr></thead>");
+
+        $.each(users, function (index, value) {
+            $('#tableUsers').append("<tr><td>" + value.name + "</td><td>"
+                + value.logicalid + "</td><td>" + value.Enabled +
+                "</td><td><a href='javascript:void(0)' class='editRec' title='edit' style='cursor:pointer;'><span class='ui-icon ui-icon-pencil'>"
+                + value.Id + "</span></a></td><td><a href='javascript:void(0)' class='delRec' title='delete' style='cursor:pointer;'><span class='ui-icon ui-icon-trash'>"
+                + value.Id + "</span></a></td>" + "</tr>");
+        });
+
+        $('#pagingDiv').empty();
+        $('#pagingDiv').append (pagination(8, currentIndex, count));
+    }
+
+    //Method which triggers the paging index 
+    function indexChanged(_index) {
+        $.getJSON("/System/AcuirePagingIndexChanged", {
+            index: _index
+        }, function (data) {
+            if (data.status == "success") {
+                loadUsersTable(data.usersList, data.currentIndex, data.recordsCount);
+            }
+        });
+    }
+
+    //Validation user
+    $('#formAcquire').validate({
+        rules: {
+            txtName: { required: true, minlength: 3 },
+            txtlogicalid: { required: true, number: true }
+        },
+        highlight: function (element) {
+            $(element).closest('div').addClass("f_error");
+            setTimeout(function () {
+            }, 200)
+        },
+        unhighlight: function (element) {
+            $(element).closest('div').removeClass("f_error");
+            setTimeout(function () {
+            }, 200)
+        },
+        errorPlacement: function (error, element) {
+            $(element).closest('div').append(error);
+        }
+    });
+
+</script>
+@*            //var didConfirm = confirm("Are you sure?");
+            //if (didConfirm == true) {
+                
+            //}
+*@

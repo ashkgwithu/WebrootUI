@@ -1,0 +1,59 @@
+﻿@using System.Threading
+<ul class="nav user_menu pull-right">
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <li class="divider-vertical"></li>
+        <li class="dropdown">
+            <a class="dropdown-toggle nav_condensed" data-toggle="dropdown" href="#">
+                @switch (Thread.CurrentThread.CurrentCulture.ToString().Split(new char[] { '-' },
+                    StringSplitOptions.RemoveEmptyEntries)[1].ToLower())
+                {
+                    default:
+                    <i class="flag-us"></i>
+                        break;
+                    case "cn":
+                    <i class="flag-cn"></i>
+                        break;
+                }
+                <b class="caret"></b>
+
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="@Url.Action("changelang", "app", new { lang = "en-US" })">
+                        <i class="flag-us"></i>
+                        English
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("changelang", "app", new { lang = "zh-CN" })">
+                        <i class="flag-cn"></i>
+                        中文
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <img src=@Url.Content("~/Content/images/user_avatar.png") alt="" class="user_avatar">@User.Identity.Name<b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li>@Html.ActionLink("My profile", "Details", "User", new { id = Membership.GetUser(User.Identity.Name).ProviderUserKey }, null)</li>
+                <li class="divider"></li>
+                <li>@Html.ActionLink(Resource.SignOutMenuItem, "SignOut", "Admin")</li>
+            </ul>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="#" onclick="openHelpDialog()">Help on this page</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Download Full Manual</a></li>
+            </ul>
+        </li>
+    }
+</ul>
