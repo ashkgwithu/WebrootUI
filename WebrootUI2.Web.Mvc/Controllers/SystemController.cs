@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -36,7 +36,6 @@ namespace WebrootUI2.Web.Mvc.Controllers
             this.roleTask = roleTask;
             this.acquireTask = acquireTask;
         }
-
 
         #region Users list
 
@@ -207,42 +206,13 @@ namespace WebrootUI2.Web.Mvc.Controllers
         }
 
         #endregion
-        #region Acuire
+
+        #region Acquire list
+        /// <summary>
+        /// Load the Users list in the Acquire view.
+        /// </summary>
         public ActionResult Acquire()
         {
-            //var acquireModel = new AcquireModel() { Id=0, name = string.Empty, logicalid = 0,Enabled=false };
-            //var acquire = new List<AcquireModel>();
-            //if (Request.QueryString["isCa"] != null && Request.QueryString["isCa"] == "true" && HttpContext.Cache["acquireModel"] != null)
-            //{
-            //    var cachedAuditModel = (AcquireModel)HttpContext.Cache["acquireModel"];
-            //    acquireModel.Id = cachedAuditModel.Id;
-            //    acquireModel.name = cachedAuditModel.name;
-            //    acquireModel.logicalid = cachedAuditModel.logicalid;
-            //    acquireModel.Enabled = cachedAuditModel.Enabled;
-            //    acquireModel.TotalRecordsCount = cachedAuditModel.Acquire.Count; 
-            //}
-            //else
-            //{
-              
-
-            //    foreach (var user in acquireTask.GetAll())
-            //    {
-            //        acquire.Add(new AcquireModel()
-            //        {
-            //             Id=user.Id,
-            //            name = user.name,
-            //            logicalid = user.LogicalId,
-            //            Enabled = user.Enabled
-
-            //        });
-            //    }
-
-            //    acquireModel.TotalRecordsCount = acquire.Count();
-            //    acquireModel.Acquire = acquire.Take(Setting.Page_Size).ToList<AcquireModel>();                 
-            //    HttpContext.Cache["acquireModel"] = new AcquireModel() { Acquire = acquire  };
-            //}
-
-            //return View(acquire.Take(Setting.Page_Size).ToList<AcquireModel>());
             var acquireModel = new AcquireModel() { Id = 0, name = string.Empty, logicalid = 0, Enabled = false };
             var acquires = new List<AcquireModel>();
             if (Request.QueryString["isCa"] != null && Request.QueryString["isCa"] == "true" && HttpContext.Cache["acquireModel"] != null)
@@ -262,38 +232,26 @@ namespace WebrootUI2.Web.Mvc.Controllers
                     acquires.Add(new AcquireModel()
                     {
                         Id = user.Id,
-                                  name = user.name,
-                                  logicalid = user.LogicalId,
-                                  Enabled = user.Enabled
+                        name = user.name,
+                        logicalid = user.LogicalId,
+                        Enabled = user.Enabled
                     });
                 }
 
                 acquireModel.Acquire = acquires.Take(Setting.Page_Size).ToList<AcquireModel>();
-                acquireModel.TotalRecordsCount = acquires.Count();             
+                acquireModel.TotalRecordsCount = acquires.Count();
                 HttpContext.Cache["acquireModel"] = new AcquireModel() { Acquire = acquires };
                 ViewBag.recordsCount = acquires.Count;
             }
-
             return View(acquires.Take(Setting.Page_Size).ToList<AcquireModel>());
         }
 
         /// <summary>
-        /// Fetch data from the cached users list in the page index change
+        /// Fetch data from the cached Acquire list in the page index change
         /// </summary>
         [HttpGet]
         public JsonResult AcuirePagingIndexChanged(int index)
         {
-            //var count = 0;
-            //var users = new List<AcquireModel>();
-            //var cachedAuditModel = (AcquireModel)HttpContext.Cache["acquireModel"];
-
-            //if (cachedAuditModel == null)
-            //    return Json(new { status = "failed" });
-
-            //users = cachedAuditModel.Acquire.Skip((index - 1) * Setting.Page_Size).Take(Setting.Page_Size).ToList<AcquireModel>();
-            //count = cachedAuditModel.Acquire.Count;
-
-            //return Json(new { status = "success", usersList = users, currentIndex = index, recordsCount = count }, JsonRequestBehavior.AllowGet);
             var count = 0;
             var users = new List<AcquireModel>();
 
@@ -304,16 +262,15 @@ namespace WebrootUI2.Web.Mvc.Controllers
 
             users = cachedAcquireModel.Acquire.Skip((index - 1) * Setting.Page_Size).Take(Setting.Page_Size).ToList<AcquireModel>();
             count = cachedAcquireModel.Acquire.Count;
-
             return Json(new { status = "success", usersList = users, currentIndex = index, recordsCount = count }, JsonRequestBehavior.AllowGet);
         }
+
         /// <summary>
-        /// Search Users in the Audit 
+        /// Search Users in the Acquire 
         /// </summary>
         [HttpGet]
         public JsonResult AcuireSearch(string name, string logicalid)
         {
-
             var users = new List<AcquireModel>();
             var count = 0;
             int logic = logicalid == null ? 0 : Convert.ToInt16(logicalid);
@@ -323,125 +280,20 @@ namespace WebrootUI2.Web.Mvc.Controllers
             {
                 users.Add(new AcquireModel()
                 {
-                     Id = user.Id,
+                    Id = user.Id,
                     name = user.name,
                     logicalid = user.LogicalId,
-                    Enabled = user.Enabled                  
+                    Enabled = user.Enabled
                 });
             }
 
-            HttpContext.Cache["acquireModel"] = new AcquireModel() { name = name, logicalid = Convert.ToInt16(logicalid) };
             count = users.Count;
+            HttpContext.Cache["acquireModel"] = new AcquireModel() { name = name, logicalid = Convert.ToInt16(logicalid), Acquire = users };
 
-            return Json(new { status = "success", userList = users.Take(Setting.Page_Size).ToList<AcquireModel>(), recordsCount = count }
+
+            return Json(new { status = "success", usersList = users.Take(Setting.Page_Size).ToList<AcquireModel>(), recordsCount = count }
                 , JsonRequestBehavior.AllowGet);
         }
-
-        
-        public ActionResult AcquireInsert()
-        {
-            //if (Request.Form.GetValues("txtName") == null)
-            //{
-            //    TempData["errorUsername"] = "System error. Please try again later";
-            //    return Redirect("txtName?action=postusername");
-            //}
-            //if (Request.Form.GetValues("txtlogicalid") == null)
-            //{
-            //    TempData["errorUsername"] = "System error. Please try again later";
-            //    return Redirect("txtName?action=postusername");
-            //}
-            //if (Request.Form.GetValues("chkenable") == null)
-            //{
-            //    TempData["errorUsername"] = "System error. Please try again later";
-            //    return Redirect("txtName?action=postusername");
-            //}
-
-            string name = Request.Form.GetValues("txtName")[0];
-            int logicalid = Convert.ToInt32(Request.Form.GetValues("txtlogicalid")[0]);
-             bool enable =false;
-             if (Request.Form.GetValues("chkenable") == null)
-                 enable = false;
-             else if (Request.Form.GetValues("chkenable")[0] == "on")
-                 enable = true;
-         
-            DateTime createdDate = DateTime.Now;
-            string createdBy = "3f5d9e9b-8cc9-44fd-98b4-977355173d4b";
-
-            var user = acquireTask.Create(logicalid, enable, name, createdDate, createdBy, createdDate, createdBy);
-
-            if (user == null)
-            {
-                TempData["errorUsername"] = "Can not retireve user information";
-                return Redirect("Acquire?action=Acquire");
-            }
-
-            TempData["error"] = "Data saved";
-            return Redirect("Acquire");
-            //return Redirect("Acquire?action=Acquire");
-        }
-        public ActionResult AcquireUpdate()
-        {
-            //if (Request.Form.GetValues("txtName") == null)
-            //{
-            //    TempData["errorUsername"] = "System error. Please try again later";
-            //    return Redirect("txtName?action=postusername");
-            //}
-            //if (Request.Form.GetValues("txtlogicalid") == null)
-            //{
-            //    TempData["errorUsername"] = "System error. Please try again later";
-            //    return Redirect("txtName?action=postusername");
-            //}
-            //if (Request.Form.GetValues("chkenable") == null)
-            //{
-            //    TempData["errorUsername"] = "System error. Please try again later";
-            //    return Redirect("txtName?action=postusername");
-            //}
-
-            string name = Request.Form.GetValues("txtName")[0];
-            int logicalid = Convert.ToInt32(Request.Form.GetValues("txtlogicalid")[0]);
-            bool enable = false;
-            if (Request.Form.GetValues("chkenable") == null)
-                enable = false;
-            else if (Request.Form.GetValues("chkenable")[0] == "on")
-                enable = true;
-
-            DateTime createdDate = DateTime.Now;
-            string createdBy = "3f5d9e9b-8cc9-44fd-98b4-977355173d4b";
-
-            var user = acquireTask.Create(logicalid, enable, name, createdDate, createdBy, createdDate, createdBy);
-
-            if (user == null)
-            {
-                TempData["errorUsername"] = "Can not retireve user information";
-                return Redirect("Acquire?action=Acquire");
-            }
-
-            TempData["error"] = "Data saved";
-            return Redirect("Acquire");
-            //return Redirect("Acquire?action=Acquire");
-        }
-        /// <summary>
-        /// Fetch data from the cached Acquie list in the page index change
-        /// </summary>
-        //[HttpGet]
-        //public JsonResult GetAcqurie(string acquireid)
-        //{
-        //    //var count = 0;
-        //    //var logs = new List<LogModel>();
-
-        //    //var cachedLogs = (List<LogModel>)HttpContext.Cache["Logs"];
-
-        //    //if (cachedLogs == null)
-        //    //    return Json(new { status = "failed" });
-
-        //    //logs = cachedLogs.Skip((index - 1) * Setting.Page_Size).Take(Setting.Page_Size).ToList<LogModel>();
-        //    //count = cachedLogs.Count; 
-        //    var acquireModel = new AcquireModel() {  name = string.Empty, logicalid = 0,Enabled=false };
-        //    //var user = acquireTask.UpdateAcquire(acquireModel);
-
-
-        //    //return Json(new { status = "success", name = user.name, logicalid = user.LogicalId, enable = user.Enabled }, JsonRequestBehavior.AllowGet);
-        //}
 
         /// <summary>
         /// Fetch data from the cached Acquie list in the page index change
@@ -458,27 +310,42 @@ namespace WebrootUI2.Web.Mvc.Controllers
         /// delete data from the  Acquire list 
         /// </summary>
         [HttpGet]
-        public JsonResult delAcqurie(string acquireid)
+        public JsonResult delAcqurie(string acquireid, int curIndex)
         {
             var user = acquireTask.Delete(Convert.ToInt32(acquireid));
-            //var count = 0;
-            //var users = new List<AcquireModel>();         
-            //var cachedAuditModel = (AcquireModel)HttpContext.Cache["acquireModel"];
-
-            //if (cachedAuditModel == null)
-            //    return Json(new { status = "failed" });
-
-            //users = users.Take(Setting.Page_Size).ToList<AcquireModel>();
-            //count = cachedAuditModel.Acquire.Count;
-
             var count = 0;
             var users = new List<AcquireModel>();
+            var usersQuery = acquireTask.GetAll();
 
-            var cachedAcquireModel = (AcquireModel)HttpContext.Cache["acquireModel"];
+            foreach (var acquire in usersQuery)
+            {
+                users.Add(new AcquireModel()
+                {
+                    Id = acquire.Id,
+                    name = acquire.name,
+                    logicalid = acquire.LogicalId,
+                    Enabled = acquire.Enabled
+                });
+            }
+            count = users.Count;
+            users = users.Skip((curIndex - 1) * Setting.Page_Size).Take(Setting.Page_Size).ToList<AcquireModel>();
 
-            if (cachedAcquireModel == null)
-                return Json(new { status = "failed" });
+            return Json(new { status = "success", usersList = users, recordsCount = count }, JsonRequestBehavior.AllowGet);
+        }
 
+        /// <summary>
+        /// Insert the data in the  Acquire list 
+        /// </summary>
+        [HttpGet]
+        public JsonResult AcquireInsert(string name, string logicalid, string enable)
+        {
+            DateTime createdDate = DateTime.Now;
+            string createdBy = "3f5d9e9b-8cc9-44fd-98b4-977355173d4b";
+
+            var user = acquireTask.Create(Convert.ToInt32(logicalid), Convert.ToBoolean(enable), name, createdDate, createdBy, createdDate, createdBy);
+            //@TempData["error"] = user == null ? "Unable to save the record" : "Unable to save the record";
+            var count = 0;
+            var users = new List<AcquireModel>();
             var usersQuery = acquireTask.GetAll();
 
             foreach (var acquire in usersQuery)
@@ -493,9 +360,41 @@ namespace WebrootUI2.Web.Mvc.Controllers
             }
             count = users.Count;
             users = users.Take(Setting.Page_Size).ToList<AcquireModel>();
-          
+
             return Json(new { status = "success", usersList = users, recordsCount = count }, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Update the data in the  Acquire list 
+        /// </summary>
+        [HttpGet]
+        public JsonResult AcquireUpdate(string AcquireId, string name, string logicalid, string enable, int curIndex)
+        {
+            var user = acquireTask.GetAcquiredata(Convert.ToInt32(AcquireId));
+            user.name = name;
+            user.LogicalId = Convert.ToInt32(logicalid);
+            user.Enabled = Convert.ToBoolean(enable);
+            var update = acquireTask.UpdateAcquire(user);
+            var count = 0;
+            var users = new List<AcquireModel>();
+            var usersQuery = acquireTask.GetAll();
+
+            foreach (var acquire in usersQuery)
+            {
+                users.Add(new AcquireModel()
+                {
+                    Id = acquire.Id,
+                    name = acquire.name,
+                    logicalid = acquire.LogicalId,
+                    Enabled = acquire.Enabled
+                });
+            }
+            count = users.Count;
+            users = users.Skip((curIndex - 1) * Setting.Page_Size).Take(Setting.Page_Size).ToList<AcquireModel>();
+         
+            return Json(new { status = "success", usersList = users, recordsCount = count }, JsonRequestBehavior.AllowGet);
+        }
+
         #endregion
 
     }
