@@ -1,41 +1,39 @@
-﻿ @using WebrootUI2.Web.Mvc.Controllers.ViewModels
+ @using WebrootUI2.Web.Mvc.Controllers.ViewModels
 @using WebrootUI2.Resources;
+
+
 @model  List<AcquireModel>
 @{
   
     ViewBag.Title = "Acquire";
     <div class="heading">
          
-        <form id="formAcquire" method="post" action="AcquireInsert">
-            @if (TempData["error"] != null)
-            {
-                <div class="alert alert-error alert-login">
-                    @TempData["error"]
-                    <a class="close" data-dismiss="alert">×</a>
-                </div>
-            }
+       <form id="formAcquire">
+        <div class="alert alert-error alert-login" style="display:none">
+            <span class="spmsg"></span>
+            <a class="close">×</a>
+        </div>
         <div class="row-fluid">
             <div class="span3">
                 <label> @Resource.Usr_nm</label>
-           <input id="txtName" type="text" name="txtName" /> 
+                <input id="txtName" type="text" name="txtName" /> 
             </div>
             <div class="span3">
                 <label>@Resource.Usr_Logicalid </label>
-               <input id="txtlogicalid" type="text"  name="txtlogicalid"   /> 
+                <input id="txtlogicalid" type="text" name="txtlogicalid" maxlength="4" /> 
             </div>
               <div class="span3">
                 <label>@Resource.Usr_enable</label>
-                 
-                <input id="chkenable" type="checkbox" name="chkenable"    /> 
+                <input id="chkenable" type="checkbox" name="chkenable" /> 
             </div>
             <div>
-                <input id="btnSave" type="submit" class="btn" value="@Resource.Usr_Save" style="margin-top: 2.5%" />
+                <input id="btnSave" type="button" class="btn" value="@Resource.Usr_Save" style="margin-top: 2.5%" />
             </div>
         </div>
-        </form>
+      </form>
     </div>
     <div class="heading">
-
+        
         <div class="row-fluid">
             <div class="span3">
                 <label>@Resource.Usr_nm </label>
@@ -54,7 +52,7 @@
         <thead>
             <tr>
                 <th>Name</th>
-                <th>logicalid</th>
+                <th>Logical Id</th>
                 <th>Enabled</th>
                 <th>Edit</th>
                 <th>Delete</th>
@@ -72,6 +70,7 @@
          }
 
     </table>
+<input id="hdindex" type="hidden" value="1" />
     <div id="pagingDiv">
         <input id="btnSearch1" type="submit" class="btn" value="Search" style="margin-top: 2.5%" />
     </div>
@@ -86,10 +85,14 @@
 <div id="editOnPage"> <p class="validateTips"></p>
 <form id="formAcquireEdt" >
 <fieldset>
+<div>
 <label for="name">@Resource.Usr_nm</label>
 <input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" />
+</div>
+<div>
 <label for="Logicalid">@Resource.Usr_Logicalid</label>
-<input type="text" name="Logicalid" id="Logicalid" value="" class="text ui-widget-content ui-corner-all" />
+<input type="text" name="Logicalid" id="Logicalid" value="" class="text ui-widget-content ui-corner-all" maxlength="4" />
+</div>
 <label for="chkEnbl">@Resource.Usr_enable</label>
 <input type="checkbox" name="chkEnbl" id="chkEnbl" value="" class="text ui-widget-content ui-corner-all" />
 </fieldset>
@@ -101,41 +104,55 @@
     $(document).ready(function myfunction() {
 
         $("#editOnPage").dialog({ autoOpen: false });
+
+        //Updating the data in the  Acquire list 
         $(document).on('click', '.editRec', function (e) {
-            var _id = $(this).find("span").text();
-            $.getJSON("/System/GetAcqurie", {
-                acquireid: _id
+                var _id = $(this).find("span").text();
+            $.getJSON("/System/GetAcqurie", { acquireid: _id
             }, function (data) {
-                if (data.status == "success")
-                    var _id = $(this).find("span").text();
-
-                var pathname = window.location.pathname;
-                if (pathname != null && pathname != "" && pathname[0] == '/') {
-                    var title = "Update";
-                    $('#editOnPage').dialog({
-                        title: title, modal: true, autoOpen: false, buttons: {
-                            "Update": function () {
-                                $(this).dialog("close");
-                            },
-                            Cancel: function () {
-                                $(this).dialog("close");
+                if (data.status == "success") {
+                    $("#editOnPage").dialog({
+                        title: 'Update', autoOpen: false, modal: true, show: {
+                            effect: "blind", duration: 1000 }, hide: {
+                                effect: "scale", duration: 1000
+                            }, buttons: {
+                                "Update": function () {
+                                    if ($("#formAcquireEdt").valid()) {
+                                        $.getJSON("/System/AcquireUpdate", {
+                                        AcquireId: _id, name: $('#name').val(), logicalid: $('#Logicalid').val(), enable: $('#chkEnbl').is(":checked") ? true : false, curIndex: $('#hdindex').val()
+                                    }, function (data) {
+                                        if (data.status == "success") {
+                                            $('.alert-error').css('display', 'block');
+                                            $('.spmsg').html("Record updated successfully.");
+                                            var pageindex = $('#hdindex').val();
+                                            loadUsersTable(data.usersList, pageindex, data.recordsCount);
+                                        }
+                                    });
+                                    $(this).dialog("close");
+                                }
+                                },
+                                Cancel: function () {
+                                    $(this).dialog("close");
+                                }
                             }
-                        },
-                        close: function () {
-                            allFields.val("").removeClass("ui-state-error");
-                        }
                     });
-
-                    $('#editOnPage').load("@Url.Action("Help", "App")" + "?path=" + pathname).dialog('open');
+                    $('#name').val(data.name); $('#Logicalid').val(data.logicalid);
+                    //alert($('#chkEnbl').is(":checked"));alert(data.enable);
+                    if (data.enable == true) {
+                        // $('#chkEnbl').attr('checked', true);
+                        $('#chkEnbl').get(0).checked = true;
+                    }
+                    else {
+                        $('#chkEnbl').removeAttr("checked");
+                    }
+                    $("#editOnPage").dialog("open");
                 }
-                $('#name').val(data.name); $('#Logicalid').val(data.logicalid);
-                $('#chkEnbl').checked = (data.enable);
-
             });
         });
        
-        $(document).on('click','.delRec', function (e) {
-            var _id = $(this).find("span").text(); //alert(_id);
+        //deleting the data in the  Acquire list 
+        $(document).on('click', '.delRec', function (e) {
+            var _id = $(this).find("span").text(); 
             $("#dialog-confirm").dialog({
                 resizable: false,
                 width:340,
@@ -144,16 +161,18 @@
                     duration: 1000
                 },
                 hide: {
-                    effect: "explode",
+                    effect: "scale",
                     duration: 1000
                 },
                 buttons: {
                     "Delete": function () {
                         $.getJSON("/System/delAcqurie", {
-                            acquireid: _id
+                            acquireid: _id, curIndex: $('#hdindex').val()
                         }, function (data) {
                             if (data.status == "success")
-                                loadUsersTable(data.usersList, 1, data.recordsCount);
+                                var pageindex = $('#hdindex').val();
+                            
+                            loadUsersTable(data.usersList, pageindex, data.recordsCount);
                         });
                         $(this).dialog("close");
                     },
@@ -164,14 +183,30 @@
             });
         });
 
+        //Insert the data in the  Acquire list 
+        $('#btnSave').click(function () {
+            if ($("#formAcquire").valid()) {
+                $.getJSON("/System/AcquireInsert", {
+                    name: $('#txtName').val(), logicalid: $('#txtlogicalid').val(), enable: $('#chkenable').is(":checked") ? true : false
+                }, function (data) {
+                    if (data.status == "success") {
+                        $('.alert-error').css('display', 'block');
+                        $('.spmsg').html("Record saved successfully.");
+                        //$('.alert-error').show().html("Record saved successfully");
+                        $('#txtName').val(''); $('#txtlogicalid').val(''); $('#chkenable').removeAttr("checked");
+                        loadUsersTable(data.usersList, 1, data.recordsCount);
+                    }
+                });
+            }
+        })
 
+        //Searching the Data
         $('#btnSearch').click(function () {
-            //$('#txtLogicId1').val();
             $.getJSON("/System/AcuireSearch", {
                 name: $('#txtName1').val(), logicalid: $('#txtLogicId1').val() == '' ? 0 : $('#txtLogicId1').val()
             }, function (data) {
                 if (data.status == "success") {
-                    loadUsersTable(data.userList, 1, data.recordsCount);
+                    loadUsersTable(data.usersList, 1, data.recordsCount);
                 }
             });
         })
@@ -186,7 +221,7 @@
     function loadUsersTable(users, currentIndex, count) {
          
         $('#tableUsers').empty();
-        $('#tableUsers').append ("<thead><tr><th>Name</th><th>logicalid</th><th>Enabled</th><th>Edit</th><th>Delete</th></tr></thead>");
+        $('#tableUsers').append ("<thead><tr><th>Name</th><th>Logical Id</th><th>Enabled</th><th>Edit</th><th>Delete</th></tr></thead>");
 
         $.each(users, function (index, value) {
             $('#tableUsers').append("<tr><td>" + value.name + "</td><td>"
@@ -200,16 +235,36 @@
         $('#pagingDiv').append (pagination(8, currentIndex, count));
     }
 
-    //Method which triggers the paging index 
+    //Method which triggers the paging index change
     function indexChanged(_index) {
-        $.getJSON("/System/AcuirePagingIndexChanged", {
-            index: _index
-        }, function (data) {
-            if (data.status == "success") {
+        $.getJSON("/System/AcuirePagingIndexChanged", { index: _index }, function (data) {
+            
+            $('#hdindex').val(_index);
+            if (data.status == "success")
                 loadUsersTable(data.usersList, data.currentIndex, data.recordsCount);
-            }
         });
     }
+
+    //Validation user while update the record
+    $('#formAcquireEdt').validate({
+        rules: {
+            name: { required: true, minlength: 3 },
+            Logicalid: { required: true, number: true }
+        },
+        highlight: function (element) {
+            $(element).closest('div').addClass("f_error");
+            setTimeout(function () {
+            }, 200)
+        },
+        unhighlight: function (element) {
+            $(element).closest('div').removeClass("f_error");
+            setTimeout(function () {
+            }, 200)
+        },
+        errorPlacement: function (error, element) {
+            $(element).closest('div').append(error);
+        }
+    });
 
     //Validation user
     $('#formAcquire').validate({
@@ -232,9 +287,10 @@
         }
     });
 
+    $(document).on('click', '.close', function (e) {
+        $('.alert-error').css('display', 'none');
+        e.preventDefault();
+    });
+
 </script>
-@*            //var didConfirm = confirm("Are you sure?");
-            //if (didConfirm == true) {
-                
-            //}
-*@
+ 
